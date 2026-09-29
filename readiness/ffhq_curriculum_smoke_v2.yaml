@@ -1,0 +1,86 @@
+model:
+  model_path: /home/boni/.cache/huggingface/hub/models--Lightricks--LTX-2.5/snapshots/e8dc69fd26150afbfa20351f6bc9ac384257f9fd/diffusion_models/ltx-2.5-22b-distilled-transformer-bf16.safetensors
+  text_encoder_path: /home/boni/.cache/huggingface/hub/models--Lightricks--LTX-2.5/snapshots/e8dc69fd26150afbfa20351f6bc9ac384257f9fd/text_encoders/gemma4-12b-with-proj-ltx-2.5-bf16.safetensors
+  video_vae_path: /home/boni/.cache/huggingface/hub/models--Lightricks--LTX-2.5/snapshots/e8dc69fd26150afbfa20351f6bc9ac384257f9fd/vae/ltx-2.5-video-vae-bf16.safetensors
+  training_mode: lora
+  load_checkpoint: null
+lora:
+  rank: 64
+  alpha: 64
+  dropout: 0.0
+  target_modules:
+  - attn1.to_k
+  - attn1.to_q
+  - attn1.to_v
+  - attn1.to_out.0
+  - attn2.to_k
+  - attn2.to_q
+  - attn2.to_v
+  - attn2.to_out.0
+  - ff.net.0.proj
+  - ff.net.2
+training_strategy:
+  name: flexible
+  video:
+    is_generated: true
+    latents_dir: latents
+    conditions:
+    - type: first_frame
+      probability: 1.0
+  audio: null
+optimization:
+  learning_rate: 5.0e-05
+  steps: 3
+  batch_size: 1
+  gradient_accumulation_steps: 1
+  max_grad_norm: 1.0
+  optimizer_type: adamw
+  scheduler_type: linear
+  scheduler_params: {}
+  enable_gradient_checkpointing: true
+acceleration:
+  mixed_precision_mode: bf16
+  quantization: null
+  load_text_encoder_in_8bit: false
+  offload_optimizer_during_validation: true
+data:
+  preprocessed_data_root: /home/boni/projects/video_training/degradation_undoing/data/precomputed/ffhq_pixel_curriculum_smoke/train/.precomputed
+  num_dataloader_workers: 2
+validation:
+  samples:
+  - prompt: Progressively depixelate the face while preserving identity, facial geometry,
+      expression, lighting, and background.
+    conditions:
+    - type: first_frame
+      image_or_video: /home/boni/projects/video_training/degradation_undoing/data/ffhq_validation/easy.png
+  video_dims:
+  - 512
+  - 512
+  - 25
+  frame_rate: 24.0
+  seed: 20260830
+  inference_steps: 8
+  interval: 3
+  video_cfg_scale: 1.0
+  video_stg_scale: 0.0
+  guidance_rescale: 0.0
+  video_modality_guidance_scale: 1.0
+  generate_audio: false
+  generate_video: true
+  skip_initial_validation: true
+checkpoints:
+  interval: 3
+  keep_last_n: 2
+  precision: bfloat16
+  no_resume: true
+  save_training_state: full
+hub:
+  push_to_hub: false
+  hub_model_id: null
+flow_matching:
+  timestep_sampling_mode: shifted_logit_normal
+  timestep_sampling_params: {}
+wandb:
+  enabled: false
+seed: 20260830
+output_dir: /home/boni/projects/video_training/degradation_undoing/outputs/readiness/ffhq_curriculum_v2
