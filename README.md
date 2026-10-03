@@ -8,17 +8,21 @@ The saved runs show measurable FFHQ improvements on a small held-out set, while 
 
 ## Visual showcase
 
-![Saved LTX-2.5 restoration comparisons and depth-only predictions. The restoration rows compare degraded input, saved model output, and clean target. The depth row contains only terminal prediction frames from three saved held-out validation videos.](docs/media/restoration-depth-grid.gif)
+![Five time points from each of three generated 49-frame LTX-2.5 restoration clips, followed by three depth-only held-out predictions.](docs/media/restoration-trajectory-grid.gif)
 
-[Open the full-size poster](docs/media/restoration-depth-grid.png) · [Download the MP4 compilation](docs/media/restoration-depth-grid.mp4)
+[Open the full-size trajectory poster](docs/media/restoration-trajectory-grid.png) · [Play the synchronized trajectory and depth compilation](docs/media/restoration-trajectory-grid.mp4)
 
-The first three rows use saved outputs from the COCO aggressive 49-frame run at checkpoint step 8,000. Each row is one selected held-out example and compares its degraded input, saved restored output, and clean target. These are endpoint comparisons; the stills do not depict intermediate frames from the model-generated restoration trajectories. Results vary by example, and this small visual selection is not a broad performance claim.
+Each of the three restoration clips contains 49 generated frames at 24 fps. The poster samples frames 0, 12, 24, 36, and 48 (0%, 25%, 50%, 75%, and 100% of clip duration). These labels mark positions within the generated video, not diffusion denoising steps. The source clips are available individually: [easy](docs/media/trajectories/restoration-trajectory-easy.mp4), [medium](docs/media/trajectories/restoration-trajectory-medium.mp4), and [hard](docs/media/trajectories/restoration-trajectory-hard.mp4).
 
-The final row shows only the terminal prediction frame from each of three saved depth validation videos at training step 3,500. These are held-out validation outputs from the depth task; the SUN RGB-D RGB inputs and ground-truth depth maps are not included in this repository. The corresponding saved adapter is `multi_task_cv/outputs/depth/checkpoints/lora_weights_step_03500.safetensors`, using `multi_task_cv/configs/depth.yaml`.
+The clips were generated inference-only from the saved COCO aggressive 49-frame step-8,000 LoRA adapter (`outputs/coco_pixel_aggressive_49/checkpoints/lora_weights_step_08000.safetensors`) with the LTX-2.5 distilled 22B BF16 transformer. Inputs are the three license-cleared degraded images listed below. Seeds are 20261003, 20261004, and 20261005; all use the same restoration prompt and saved eight-step sigma schedule. A process-local Gemma4 RoPE initialization compatibility shim matched per-layer head dimensions expected by the installed Transformers 5.17 runtime. It did not modify the shared environment or project inference source. These are generated examples, not a quality benchmark or evidence of faithful recovery of details missing from the degraded input.
+
+[The endpoint comparison poster](docs/media/restoration-depth-grid.png) remains available separately; it compares degraded inputs, saved outputs, and clean targets. The trajectory compilation contains intermediate generated frames and does not include clean targets.
+
+The final row of the new compilation shows only terminal prediction frames from three saved depth validation videos at training step 3,500. These are held-out validation outputs from the depth task; the SUN RGB-D RGB inputs and ground-truth depth maps are not included in this repository. The corresponding saved adapter is `multi_task_cv/outputs/depth/checkpoints/lora_weights_step_03500.safetensors`, using `multi_task_cv/configs/depth.yaml`.
 
 ### Attribution and media license
 
-The restoration examples are modified crops/resizes of the following COCO validation images. Each was degraded, passed through the saved restoration checkpoint, and assembled with labels into the comparison graphic:
+The restoration examples are modified crops/resizes of the following COCO validation images. Each input was degraded, passed through the saved restoration checkpoint, and assembled with labels into the trajectory media:
 
 | Tier | COCO image | Flickr source and creator | Source license |
 | --- | --- | --- | --- |
@@ -26,9 +30,10 @@ The restoration examples are modified crops/resizes of the following COCO valida
 | Medium | `000000572517.jpg` | [“Polar bear” by Marcel “MadJo” de Jong](https://www.flickr.com/photos/madjo/8754578923/) | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
 | Hard | `000000245915.jpg` | [“Washing down at the river” by S Baker](https://www.flickr.com/photos/sarahbaker/211747310/) | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
 
-The composite media is distributed under [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/), following the easy example’s share-alike terms. The graphic adds labels and layout, and the examples show altered degraded and model-output versions alongside the clean target. The source attributions above identify the original photographs; the creators do not endorse this project.
+The restoration composite media is distributed under [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/), following the easy example’s share-alike terms. The graphics add labels and layout, and the clips show generated, altered versions of the licensed photographs. The source attributions above identify the original photographs; the creators do not endorse this project.
 
 The depth task uses SUN RGB-D. Please cite Shuran Song, Samuel P. Lichtenberg, and Jianxiong Xiao, [“SUN RGB-D: A RGB-D Scene Understanding Benchmark Suite,” CVPR 2015](https://openaccess.thecvf.com/content_cvpr_2015/html/Song_SUN_RGB-D_A_2015_CVPR_paper.html); see the [dataset project page](https://rgbd.cs.princeton.edu/) for dataset context. Only the three model-predicted terminal depth frames are included here; their corresponding source frames and ground-truth maps remain on the DGX and are not redistributed.
+
 
 ## What the code does
 
