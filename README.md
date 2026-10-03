@@ -6,6 +6,30 @@ The saved runs show measurable FFHQ improvements on a small held-out set, while 
 
 ![Training diagnostics from the completed 5,000-step FFHQ full-restoration run, including flow-matching loss, per-sigma loss, curriculum weights, and step duration.](docs/training-diagnostics.png)
 
+## Visual showcase
+
+![Saved LTX-2.5 restoration comparisons and depth-only predictions. The restoration rows compare degraded input, saved model output, and clean target. The depth row contains only terminal prediction frames from three saved held-out validation videos.](docs/media/restoration-depth-grid.gif)
+
+[Open the full-size poster](docs/media/restoration-depth-grid.png) · [Download the MP4 compilation](docs/media/restoration-depth-grid.mp4)
+
+The first three rows use saved outputs from the COCO aggressive 49-frame run at checkpoint step 8,000. Each row is one selected held-out example and compares its degraded input, saved restored output, and clean target. These are endpoint comparisons; the stills do not depict intermediate frames from the model-generated restoration trajectories. Results vary by example, and this small visual selection is not a broad performance claim.
+
+The final row shows only the terminal prediction frame from each of three saved depth validation videos at training step 3,500. These are held-out validation outputs from the depth task; the SUN RGB-D RGB inputs and ground-truth depth maps are not included in this repository. The corresponding saved adapter is `multi_task_cv/outputs/depth/checkpoints/lora_weights_step_03500.safetensors`, using `multi_task_cv/configs/depth.yaml`.
+
+### Attribution and media license
+
+The restoration examples are modified crops/resizes of the following COCO validation images. Each was degraded, passed through the saved restoration checkpoint, and assembled with labels into the comparison graphic:
+
+| Tier | COCO image | Flickr source and creator | Source license |
+| --- | --- | --- | --- |
+| Easy | `000000117719.jpg` | [“ex ΡΑΔΙΟΦΩΝΟ Bar (17.5/52)” by Kat (`swimparallel`)](https://www.flickr.com/photos/swimparallel/3499231904/) | [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/) |
+| Medium | `000000572517.jpg` | [“Polar bear” by Marcel “MadJo” de Jong](https://www.flickr.com/photos/madjo/8754578923/) | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
+| Hard | `000000245915.jpg` | [“Washing down at the river” by S Baker](https://www.flickr.com/photos/sarahbaker/211747310/) | [CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) |
+
+The composite media is distributed under [CC BY-SA 2.0](https://creativecommons.org/licenses/by-sa/2.0/), following the easy example’s share-alike terms. The graphic adds labels and layout, and the examples show altered degraded and model-output versions alongside the clean target. The source attributions above identify the original photographs; the creators do not endorse this project.
+
+The depth task uses SUN RGB-D. Please cite Shuran Song, Samuel P. Lichtenberg, and Jianxiong Xiao, [“SUN RGB-D: A RGB-D Scene Understanding Benchmark Suite,” CVPR 2015](https://openaccess.thecvf.com/content_cvpr_2015/html/Song_SUN_RGB-D_A_2015_CVPR_paper.html); see the [dataset project page](https://rgbd.cs.princeton.edu/) for dataset context. Only the three model-predicted terminal depth frames are included here; their corresponding source frames and ground-truth maps remain on the DGX and are not redistributed.
+
 ## What the code does
 
 - Uses a frozen LTX-2.5 distilled 22B transformer and a rank-64 LoRA adapter in BF16.
